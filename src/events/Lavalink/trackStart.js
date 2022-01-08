@@ -23,8 +23,10 @@ module.exports = async (client, player, track, payload) => {
    const But4 = new MessageButton().setCustomId("skip").setEmoji("⏭️").setStyle("SECONDARY");
     
    const But5 = new MessageButton().setCustomId("vup").setEmoji("🔊").setStyle("SECONDARY");
+
+   const But6 = new MessageButton().setCustomId("loop").setEmoji("🔁").setStyle("SECONDARY");
    
-   const row = new MessageActionRow().addComponents(But1, But2, But3, But4, But5);
+   const row = new MessageActionRow().addComponents(But1, But2, But3, But4, But5, But6);
    
   let NowPlaying = await client.channels.cache
     .get(player.textChannel)
@@ -80,7 +82,18 @@ module.exports = async (client, player, track, payload) => {
             } else if (i.customId === "vup") {
                if (!player) {
                  return collector.stop();
-               }
+               } else if(i.customId === "loop") {
+        if(!player) {
+          collector.stop();
+        }
+        await player.setTrackRepeat(!player.trackRepeat);
+        const uni = player.trackRepeat ? "Enabled" : "Disabled";
+
+        const embed = new MessageEmbed()
+            .setDescription(`\`🔁\` **Loop has been:** \`${uni}\``)
+            .setColor('#000001');
+
+        message.reply({ embeds: [embed], ephemeral: true });
                let amount = Number(player.volume) + 10;
             if(amount >= 150) return i.editReply({ embeds: [embed.setAuthor({name: i.member.user.tag, iconURL: i.member.user.displayAvatarURL({ dynamic: true })}).setDescription( `Cannot higher the player volume further more.`)]}).then(msg => { setTimeout(() => {msg.delete()}, 10000)});
                await player.setVolume(amount);
